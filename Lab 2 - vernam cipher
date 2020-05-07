@@ -20,7 +20,6 @@ int main()
 		do {
 			in_file.read(in_data, len);         // читаем в буфер
 			key_file.read(key_data, len);
-			cout << key_file.gcount() << endl;
 			for (int i = 0; i < key_file.gcount(); i++)
 			{
 				if (in_data[i] == '0' || in_data[i] == '1')
