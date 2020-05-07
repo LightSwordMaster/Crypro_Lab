@@ -1,10 +1,10 @@
 
 /*
-  * Ëàáîðàòîðíàÿ 1 - øèôð öåçàðÿ
+  * Лабораторная 1 - шифр цезаря
   * File:   main.cpp
   * Author: spiryanin.2015
   *
-  * Created on 30 àïðåëÿ 2020 ã., 2:14
+  * Created on 30 апреля 2020 г., 2:14
   */
 
 #include <cstdlib>
@@ -16,7 +16,7 @@
 using namespace std;
 
 string encode(string str_message, int key)     
-// Ôóíêöèÿ äëÿ êîäèðîâàíèÿ ñîîáùåíèé íà ðóññêîì è àíãëèéñêîì
+// Функция для кодирования сообщений на русском и английском
 {
 
 	char ch;
@@ -30,13 +30,13 @@ string encode(string str_message, int key)
 		if (ch >= 'A' && ch <= 'Z') {
 			str_message[j] = char(int(ch + key - 'A') % 26 + 'A');
 		}
-		if (ch >= -32 && ch <= -1) {  // äèàïàçîí â êîäèðîâêå êîíñîëè äëÿ ñòðî÷íûõ ðóññêèõ áóêâ
+		if (ch >= -32 && ch <= -1) {  // диапазон в кодировке консоли для строчных русских букв
 			ch = ch + 32;
-			str_message[j] = char('à' + (ch + key) % 32);
+			str_message[j] = char('а' + (ch + key) % 32);
 		}
-		if (ch >= -64 && ch <= -33) { // äèàïàçîí â êîäèðîâêå êîíñîëè äëÿ çàãëàâíûõ ðóññêèõ áóêâ
+		if (ch >= -64 && ch <= -33) { // диапазон в кодировке консоли для заглавных русских букв
 			ch = ch + 64;
-			str_message[j] = char('À' + (ch + key) % 32);
+			str_message[j] = char('А' + (ch + key) % 32);
 		}
 
 
@@ -45,7 +45,7 @@ string encode(string str_message, int key)
 }
 
 string decode(string str_message, int key)
-// ôóíêöèÿ äëÿ äåêîäèðîâàíèÿ ñîîáùåíèÿ íà ðóññêîì è àíãëèéñêîì
+// функция для декодирования сообщения на русском и английском
 {
 	char ch;
 	for (int j = 0; j<str_message.length(); ++j) {
@@ -58,13 +58,13 @@ string decode(string str_message, int key)
 		else if (ch >= 'A' && ch <= 'Z') {
 			str_message[j] = char(int(ch + 26 -  key - 'A') % 26 + 'A');
 		}
-		else if (ch >= -32 && ch <= -1) { // äèàïàçîí â êîäèðîâêå êîíñîëè äëÿ ñòðî÷íûõ ðóññêèõ áóêâ
+		else if (ch >= -32 && ch <= -1) { // диапазон в кодировке консоли для строчных русских букв
 			ch = ch + 32;
-			str_message[j] = char('à' + (ch + 32 - key) % 32);
+			str_message[j] = char('а' + (ch + 32 - key) % 32);
 		}
-		else if (ch >= -64 && ch <= -33) { // äèàïàçîí â êîäèðîâêå êîíñîëè äëÿ çàãëàâíûõ ðóññêèõ áóêâ
+		else if (ch >= -64 && ch <= -33) { // диапазон в кодировке консоли для заглавных русских букв
 			ch = ch + 64;
-			str_message[j] = char('À' + (ch + 32 - key) % 32);
+			str_message[j] = char('А' + (ch + 32 - key) % 32);
 		}
 
 	}
@@ -78,18 +78,18 @@ string decode(string str_message, int key)
 int main(int argc, char** argv) {
 	ifstream in_file("input.txt");
 	ofstream out_file("output.txt");
-	int mode=1;   //ïåðåìåííàÿ äëÿ âûáîðà ðåæèìà ðàáîòû ïðîãðàììû: êîäèðîâàíèå/äåêîäèðîâàíèå è ä.ð.
+	int mode=1;   //переменная для выбора режима работы программы: кодирование/декодирование и д.р.
 	string inp;
 	int  key;
 
-	SetConsoleCP(1251);            // ïîääåðæêà ðóññêîãî â êîíñîëè íà ââîä è âûâîä
+	SetConsoleCP(1251);            // поддержка русского в консоли на ввод и вывод
 	SetConsoleOutputCP(1251);
 
 
 while(mode!=0)
 {
-	in_file.clear();                 //  ò.ê. ôóíêöèÿ ìîæåò âûçûâàòüñÿ ìíîãîêðàòíî, òî íóæíî î÷èñòèòü ôëàãè (äîõîäèì äî eof) 
-	in_file.seekg(0, ios::beg);      // è âåðíóòüñÿ â íà÷àëî
+	in_file.clear();                 //  т.к. функция может вызываться многократно, то нужно очистить флаги (доходим до eof) 
+	in_file.seekg(0, ios::beg);      // и вернуться в начало
 	cout << "Type 1 to encode string" << endl;
 	cout << "Type 2 to decode string" << endl;
 	cout << "Type 3 to encode file" << endl;
@@ -99,7 +99,7 @@ while(mode!=0)
 	cin >> mode;
 	switch (mode)
 	{
-	case 1:  // êîäèðîâàíèå ïî êëþ÷ó
+	case 1:  // кодирование по ключу
 	{
 		cout << "Enter a message to encrypt: " << endl;
 		cin >> inp;
@@ -110,7 +110,7 @@ while(mode!=0)
 
 	}
 	break;
-	case 2: // äåêîäèðîâàíèå ïî êëþ÷ó
+	case 2: // декодирование по ключу
 	{
 		cout << "Enter a message to decrypt: " << endl;
 		cin >> inp;
@@ -121,7 +121,7 @@ while(mode!=0)
 
 	}
 	break;
-	case 3: // êîäèðîâàíèå ôàéëà
+	case 3: // кодирование файла
 	{
 		cout << "Enter key: " << endl;
 		cin >> key;
@@ -134,7 +134,7 @@ while(mode!=0)
 		}
 	}
 	break;
-	case 4: //äåêîäèðîâàíèå ôàéëà
+	case 4: //декодирование файла
 	{
 		cout << "Enter key: " << endl;
 		cin >> key;
@@ -147,14 +147,14 @@ while(mode!=0)
 		}
 	}
 	break;
-	case 5: // áðóò ôîðñ ñòðîêè 
+	case 5: // брут форс строки 
 	{
-		int n = 26; // äëèíà àíãëèéñêîãî àëôàâèòà
+		int n = 26; // длина английского алфавита
 		cout << "Enter a message to decrypt: " << endl;
 		cin >> inp;
 		cout << "Possible messages" << endl;
-		if (inp[0] >= -128 && inp[0] <= -17) // äèàïàçîí ñèìâîëîâ äëÿ ðóññêîãî
-			n = 32;                          // àëôàâèò áåç ¸, ò.ê. ¸ ñòîèò îòäåëüíî â òàáëèöå ñèìâîëîâ
+		if (inp[0] >= -128 && inp[0] <= -17) // диапазон символов для русского
+			n = 32;                          // алфавит без ё, т.к. ё стоит отдельно в таблице символов
 		for (int i = 1; i <= n; i++)
 			cout << decode(inp, i) << endl;
 	}
@@ -169,6 +169,5 @@ while(mode!=0)
 	in_file.close();
 	out_file.close();
 	return 0;
-	
 }
 
