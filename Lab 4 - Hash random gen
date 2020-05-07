@@ -1,0 +1,29 @@
+// Лабораторная работа 3 - Криптографические хэш-функции
+// Использована хэш-функция из стандартной библиотеки 
+// для генерации случайной последовательности
+
+#include <iostream>
+#include <string>
+#include <time.h>
+using namespace std;
+static unsigned long int int_key = 1;
+
+size_t hash_random()
+{
+	int_key = int_key + 1;
+	string key = to_string(int_key); 
+	return hash<string>{}(key);
+}
+ 
+void hash_srand(unsigned long int seed)  // инициализация генератора
+{
+	int_key = seed;
+}
+
+
+int main()
+{
+	hash_srand(time(NULL));
+	for (int i = 0; i < 100; i++)
+		cout << hash_random() << endl;
+}
