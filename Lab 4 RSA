@@ -108,20 +108,7 @@ int main()
 	SetConsoleOutputCP(1251);
 
 	srand(time(NULL));
-	p = rand() % max;
-	q = rand() % max;;
-	while (!is_prime(p))
-	{
-		p = rand() % max;;
-	}
-	while (!is_prime(q) || q == p)
-	{
-		q = rand() % max;;
-	}
-	n = p * q;
-	phi = (p - 1) * (q - 1);
-	e = find_e(phi);
-	d = find_d(e, phi);
+
 
 	while (mode != 0)
 	{
@@ -132,16 +119,36 @@ int main()
 		cout << "Введите 1 для шифрования или 2 для расшифрования сообщения" << endl;
 		cin >> mode;
 
-		cout << "p = " << p << ", q = " << q << endl;
-		cout << "n = " << n << endl;
-		cout << "phi = " << phi << endl;
-		cout << "e = " << e << endl;
-		cout << "d = " << d << endl;
-		cout << "Открытый ключ: e = " << e << ", n = " << n << endl;
-		cout << "Закрытый ключ: d = " << d << ", n = " << n << endl;
 
 		if (mode == 1)
+		{
+			max = message;
+			p = rand() % max;
+			q = rand() % max;;
+			while (!is_prime(p) )
+			{
+				p = rand() % max;;
+			}
+			while (!is_prime(q) || q == p)
+			{
+				q = rand() % max;;
+			}
+			n = p * q;
+			phi = (p - 1) * (q - 1);
+			e = find_e(phi);
+			d = find_d(e, phi);
+
+			cout << "p = " << p << ", q = " << q << endl;
+			cout << "n = " << n << endl;
+			cout << "phi = " << phi << endl;
+			cout << "e = " << e << endl;
+			cout << "d = " << d << endl;
+			cout << "Открытый ключ: e = " << e << ", n = " << n << endl;
+			cout << "Закрытый ключ: d = " << d << ", n = " << n << endl;
+			
 			res = encrypt(message, e, n);
+
+		}
 		if (mode == 2)
 			res = decrypt(message, d, n);
 
