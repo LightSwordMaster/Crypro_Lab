@@ -1,0 +1,151 @@
+// Лабораторная работа 4 - Асимметричные криптосистемы
+// Реализация RSA 
+
+#include <iostream>
+#include <string>
+#include <ctime>
+#include <cmath>
+#include <windows.h>
+using namespace std;
+
+bool is_prime( long int n) // проверка на простоту
+{
+	if (n == 1 || n==0 ) return false;
+	long int i, max;
+	max = ( long int)sqrt((long double)n);
+	for (i = 2; i <= max; i++)
+	{
+		if (n % i == 0) return false;
+	}
+
+	return true;
+
+ }
+
+ long int gcd( long int a,  long int b) // НОД, рекурсивный вариант 
+{
+	if (b == 0) return a;
+	return gcd(b, a % b);
+}
+
+
+ long int find_e( long int t)
+{
+	// Выбирается целое число e ( 1 < e < t ) // взаимно простое со значением функции Эйлера (t)
+
+	long int e;
+
+	for (e = 2; e < t; e++)
+	{
+		if (gcd(e, t) == 1)
+		{
+			return e;
+		}
+	}
+
+	return -1;
+}
+
+ long int find_d( long int e,  long int t)
+{
+	// Вычисляется число d, мультипликативно обратное к числу e по модулю φ(n), то есть число, удовлетворяющее сравнению:
+	//    d ⋅ e ≡ 1 (mod φ(n))
+
+	long int d;
+	long int k = 1;
+
+	while (1)
+	{
+		k = k + t;
+
+		if (k % e == 0)
+		{
+			d = (k / e);
+			return d;
+		}
+	}
+
+}
+
+ long long int fast_power(long long  int a, long long int b, long long  int mod) // быстрое возведение в степень по модулю
+ {
+	 if (b == 0) return 1;
+	 if (mod == 1) return 0;
+
+	 long long int y = 1;
+	 a = a % mod;
+	 while (b > 0) {
+		 if ((b % 2) == 1)
+			 y = (y * a) % mod;
+		 b = b >> 1;
+		 a = (a * a) % mod;
+	 }
+	 return y;
+ }
+
+
+long long int encrypt(long  long int m,  long long int e,  long long int n)
+{
+	return fast_power(m,e,n);
+}
+
+long long int decrypt(long  long int c,  long long int d,  long long int n)
+{
+	return fast_power(c,d,n);
+}
+
+
+
+int main()
+{
+
+	long int p, q, n, phi, e, d;
+	long int message, res;
+	int mode = 1;
+	int max = 999;
+
+	SetConsoleCP(1251);                // Поддержка русского в консоли
+	SetConsoleOutputCP(1251);
+
+	srand(time(NULL));
+	p = rand() % max;
+	q = rand() % max;;
+	while (!is_prime(p))
+	{
+		p = rand() % max;;
+	}
+	while (!is_prime(q) || q == p)
+	{
+		q = rand() % max;;
+	}
+	n = p * q;
+	phi = (p - 1) * (q - 1);
+	e = find_e(phi);
+	d = find_d(e, phi);
+
+	while (mode != 0)
+	{
+		cout << "Введите числовое сообщение: " << endl;
+		cin >> message;
+
+		cout << "Введите 1 для шифрования или 2 для расшифрования сообщения" << endl;
+		cin >> mode;
+
+		cout << "p = " << p << ", q = " << q << endl;
+		cout << "n = " << n << endl;
+		cout << "phi = " << phi << endl;
+		cout << "e = " << e << endl;
+		cout << "d = " << d << endl;
+		cout << "Открытый ключ: e = " << e << ", n = " << n << endl;
+		cout << "Закрытый ключ: d = " << d << ", n = " << n << endl;
+
+		if (mode == 1)
+			res = encrypt(message, e, n);
+		if (mode == 2)
+			res = decrypt(message, d, n);
+
+		cout << "Результат " << res << endl;
+		cout << "Введите 0 чтобы выйти или любое число для продолжения работы" << endl;
+		cin >> mode;
+	}
+}
