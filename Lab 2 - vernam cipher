@@ -1,1 +1,39 @@
-temp
+
+// Лабораторная 2 Шифр Вернама
+// В файле представлено сообщение и ключ в виде символов 0 и 1
+
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+int main()
+{
+	const int len = 4;
+	char in_data[len];
+	char key_data[len];
+	char buffer[len];
+	ifstream in_file("input_1.txt"), key_file("key.txt");
+	ofstream out_file("output_1.txt");
+	if (in_file.is_open() && key_file.is_open())
+	{
+		
+		do {
+			in_file.read(in_data, len);         // читаем в буфер
+			key_file.read(key_data, len);
+			cout << key_file.gcount() << endl;
+			for (int i = 0; i < key_file.gcount(); i++)
+			{
+				if (in_data[i] == '0' || in_data[i] == '1')
+					buffer[i] = (in_data[i] - '0') ^ (key_data[i] - '0') + '0';       // - '0' т.к. иначе получим код символа
+			}
+			out_file.write(buffer, key_file.gcount());
+		} while (!in_file.eof());
+	}
+	cout << "vernam cipher" << endl;
+	in_file.close();
+	key_file.close();
+	out_file.close();
+	return 0;
+
+}
+
