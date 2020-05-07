@@ -1,0 +1,86 @@
+// Лабораторная работа 6 - Дискретное логарифмирование 
+// второй вариант той же программы немного отличается реализацией метода шаг великана
+
+#include <iostream>
+#include <windows.h>
+#include <unordered_map>
+
+using namespace std;
+
+long long int fast_power(long long  int a, long long int b, long long  int mod) // Быстрое возведение в степень по модулю из прошлых лаб
+{
+	if (b == 0) return 1;
+	if (mod == 1) return 0;
+
+	long long int y = 1;
+	a = a % mod;
+	while (b > 0) {
+		if ((b % 2) == 1)
+			y = (y * a) % mod;
+		b = b >> 1;
+		a = (a * a) % mod;
+	}
+	return y;
+}
+
+
+int main()
+{
+	long int y, a, p, x;           // y = a^x mod p
+
+	SetConsoleCP(1251);           // Поддержка русского
+	SetConsoleOutputCP(1251);
+
+	cout << " y = a^x mod p " << endl;
+	cout << "Введите значение параметра y" << endl;
+	cin >> y;
+	cout << "Введите значение параметра a" << endl;
+	cin >> a;
+	cout << "Введите значение параметра p" << endl;
+	cin >> p;
+	cout <<  a << "^x mod " << p << " = " << y << endl;
+
+	// Метод полного перебора
+	for (int i = 0; i < p; i++)
+		if (y == fast_power(a, i, p))
+		{
+			cout << "Результат методом перебора x:  " << i << endl;
+			cout << a << "^" << i << " mod " << p << " = " << y << endl;
+			break;
+		}
+
+	// Шаг великана - шаг младенца 
+
+	long int m, k;
+	unordered_map<long int, long int> value;        // Выбрал, т.к. быстрый доступ к данным
+
+	k = ceil(sqrt(p));
+	m = k + 1;
+	cout << "k = " << k << ", m = " << m << endl;
+
+	cout << " Массив a^m, a^2m, ... , a^(k*m)" << endl;
+	for (long int i = m; i>= 1; --i)
+	{
+		value[fast_power(a, i * m, p)] = i;
+		cout << fast_power(a, i * m, p) <<", " ;
+	}
+	cout << endl;
+
+	cout << " Массив y, ay, ... , a^(m-1) *y" << endl;
+	for (int j = 0; j <=k; ++j)
+	{
+		int cur = ((fast_power(a, j, p) * y ) % p);
+		cout << cur << ", ";
+		if (value[cur])
+		{
+			int ans = value[cur] * m - j;
+			if (ans < p)
+			{
+				cout << endl << "Решение: " << ans << endl;
+				break;
+			}
+		}
+	}
+
+}
+
