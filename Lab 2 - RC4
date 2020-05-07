@@ -1,0 +1,49 @@
+
+// Лабораторная 2 - симметричные шифры  
+// Реализация RC4
+
+#include <cstdlib>
+#include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <string>
+
+using namespace std;
+int main()
+{
+	ifstream in_file("input.txt", ios::binary);
+	ofstream out_file("output.txt", ios::binary);
+	unsigned char S[256];
+
+	int i = 0;
+
+	for (i = 0; i < 256; i++)  // инициализация для формирования начальной перестановки
+		S[i] = i;
+
+	int j = 0, choice = 0;
+
+	cout << "RC4 cicpher" << endl;
+	string key;         
+	cout << "Enter the key: ";
+	cin >> key;
+
+	for (i = 0; i < 256; i++)  // формирование начальной перестановки
+	{
+		j = (j + S[i] + key.at(i % key.length())) % 256;
+		swap(S[i], S[j]);
+	}
+	char x;
+	j = 0;
+	i = 0;
+	while (in_file.read(&x, 1))     //считываем по 1 байту, можно сделать и через буфер 
+	{
+		i = (i + 1) % 256;         // формируем псевдослучайное число 
+		j = (j + S[i]) % 256;
+		std::swap(S[i], S[j]);
+		char temp = S[(S[i] + S[j]) % 256] ^ x;  // обычный xor
+		out_file.write(&temp, 1);      // записываем результат 
+	}
+	in_file.close();
+	out_file.close();
+}
+
