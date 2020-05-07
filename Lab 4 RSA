@@ -125,6 +125,7 @@ int main()
 
 	while (mode != 0)
 	{
+		cout << "RSA" << endl;
 		cout << "Введите числовое сообщение: " << endl;
 		cin >> message;
 
