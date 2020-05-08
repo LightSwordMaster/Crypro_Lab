@@ -1,4 +1,5 @@
 // Лабораторная работа 8 LSB replacement
+// Ограничения - 24 битный bmp
 
 #include <cmath>
 #include <cstdio>
