@@ -1,0 +1,83 @@
+// Лабораторная работа 5 
+// Инфраструктура открытых ключей, построение цепочки доверия в иерархической PKI
+
+#include <iostream>
+#include <string>
+#include <unordered_map>
+#include <ctime>
+#include <windows.h>
+
+
+using namespace std;
+
+struct certificate
+{
+	string owner;
+	string CA;
+	bool valid;
+};
+
+
+
+int main()
+{
+	unordered_map<string, string> PKI;
+	int num_ca1, num_ca2, num_ca3, num_user, temp;
+	num_user = 0;
+
+	SetConsoleCP(1251);                // Поддержка русского в консоли
+	SetConsoleOutputCP(1251);
+
+	srand(time(NULL));
+
+	num_ca1 = rand() % 3+1;
+	num_ca2 = rand() % 5+1;
+	num_ca3 = rand() % 7+1;
+	num_user = rand() % 8+2;
+
+	cout << "Число УЦ первого уровня - " << num_ca1 << ", второго уровня - " << num_ca2 << ", третьего уровня - "
+		<< num_ca3<<", число пользователей - " << num_user << endl;
+
+	// формат владелец-ЦС
+	PKI["Root CA"] = "Root CA";
+	cout << "Root CA" << endl;
+	for (int i = 0; i < num_ca1; ++i)
+	{
+		PKI["CA" + to_string(i)] = "Root CA";
+		cout << "CA" + to_string(i) << " -  Root CA   ";
+	}
+	cout << endl;
+	for (int i = 0; i < num_ca2; ++i)
+	{
+		PKI["CA" + to_string(i+num_ca1)] = "CA" + to_string(rand() % num_ca1);
+		cout << "CA" + to_string(i + num_ca1)<<" - "<< PKI["CA" + to_string(i + num_ca1)] <<"    ";
+	}
+	cout << endl;
+	for (int k = 0; k < num_ca3; ++k)
+	{
+		PKI["CA" + to_string(k+num_ca1+num_ca2)] = "CA" + to_string(rand() % num_ca2 + num_ca1);
+		cout << "CA" + to_string(k + num_ca1 + num_ca2) << " - "<< PKI["CA" + to_string(k + num_ca1 + num_ca2)] << "   ";
+	}
+	cout << endl;
+	for (int p = 0; p < num_user; ++p)
+	{
+		PKI["User" + to_string(p)] = "CA" + to_string(rand() % num_ca3 + num_ca1 + num_ca2);
+		cout << "User" + to_string(p) << " - " << PKI["User" + to_string(p)] << "  ";
+	}
+	cout << endl;
+
+	string key;
+	cout << "Введите пользователя, для которого построить цепочку" << endl;
+	cin >> key;
+
+	
+	cout << "Цепочка доверия" << endl;
+	// построение цепочки доверия
+	while (!PKI[key].empty())
+	{
+		cout << " | " << endl << key << endl;
+		if (key == PKI[key]) break;
+		key = PKI[key];
+	}
+
+}
