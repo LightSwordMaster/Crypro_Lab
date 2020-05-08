@@ -1,0 +1,129 @@
+// Лабораторная работа 8 LSB replacement
+
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <iostream>
+#include <string>
+#include "bitmap_image.hpp" // Использую сторонню библиотеку для работы с bmp, все файлы с исходниками на диске
+#include <Windows.h>
+
+using namespace std;
+
+static unsigned long int int_key = 1;
+
+size_t hash_random()  // генератор псевдослучайных чисел из прошлых лаб, чтобы не записывать информацию в пиксели по порядку
+{
+	int_key = int_key + 1;
+	string key = to_string(int_key);
+	return hash<string>{}(key);
+}
+
+void hash_srand(unsigned long int seed)
+{
+	int_key = seed;
+}
+
+
+int main()
+{
+	unsigned char mask = 0xfe;  // в двоичном виде  11111110
+	std::string file_name("original-0.bmp");
+	string file_name_str;
+	int mode = 0;
+	string message;
+
+
+	SetConsoleCP(1251);                // Поддержка русского
+	SetConsoleOutputCP(1251);
+
+
+	
+
+	cout << "Введите имя файла для записи информации:" << endl;
+	cin >> file_name;
+	bitmap_image image(file_name);
+	if (!image)
+	{
+		printf("test01() - Error - Failed to open '%s'\n", file_name.c_str());
+		return 0;
+	}
+	int image_size = image.width() * image.height();  // использутеся для ограничения диапазона позиции при генерации псевдослучайных чисел
+	cout << "Выберите действие:  1 - внедрение текста, 2 - извлечение текста," << endl;
+	cin >> mode;
+	if (mode == 1)
+	{
+		
+		cout << "Допустимая длина текста для сокрытия в данном изображении - " << image.height() * image.width() / 8 << " символов" << endl;
+		cout << "Введите текст"<<endl;
+		cin.ignore(256, '\n');       // cin и getline не сильно совместимы, поэтому приходится так 
+
+		getline(cin, message);
+		cout << "Длина введённого текста " << message.length() << " символов" << endl;
+		int pixCount = hash_random()% image_size;    // генерируем позицию пикселя 
+		unsigned char r, g, b;
+
+		int len = message.length(); // размер сообщения, чтобы знать. когда остановиться при считывании
+
+
+		for (int j = 31; j >= 0; j--)   // записываем размер сообщения  в файл
+		{
+			image.get_pixel(pixCount % image.width(), int(pixCount / image.width()), r, g, b);
+			b = (b & mask) | ((len >> j) & 0x01);
+			image.set_pixel(pixCount % image.width(), int(pixCount / image.width()), r, g, b);
+			pixCount = hash_random() % image_size;
+		}
+
+		for(int i=0; i<message.length(); i++) // прячем само сообщение
+		{
+			for (int j = 7; j >= 0; j--) 
+			{
+				image.get_pixel(pixCount % image.width(), int(pixCount / image.width()), r, g, b);
+					b = (b & mask) | ((message[i] >> j) & 0x01);  
+					// (b & 11111110 ) | - меняем только последний бит, (message[i] >> j) & 00000001 - сдвигаем влево нужный нам бит
+					image.set_pixel(pixCount% image.width(), int(pixCount / image.width()), r, g, b);
+				pixCount= hash_random() % image_size;
+			}
+		}
+		image.save_image("test.bmp");
+	}
+
+	if (mode == 2)
+	{
+		int len = 0;
+		char temp;
+		message = "";
+		hash_srand(1);
+		int pixCount = hash_random() % image_size;
+		unsigned char r, g, b;
+
+		// считываем длину сообщения
+		for (int j = 31; j >= 0; j--) 
+		{
+			image.get_pixel(pixCount % image.width(), int(pixCount / image.width()), r, g, b);
+			len = ((b & 1) << j) | len;
+			image.set_pixel(pixCount % image.width(), int(pixCount / image.width()), r, g, b);
+			pixCount = hash_random() % image_size;
+		}
+
+		// считываем само сообщение
+		for (int i = 0; i < len; i++)
+		{
+			temp = 0;
+			for (int j = 7; j >= 0; j--)
+			{
+				image.get_pixel(pixCount % image.width(), int(pixCount / image.width()), r, g, b);
+				temp = ((b & 0x01) << j) | temp;
+				// (b & 00000001) - получаем только последний бит, << сдвигаем  вправо на нужную позицию
+				image.set_pixel(pixCount % image.width(), int(pixCount / image.width()), r, g, b);
+				pixCount= hash_random() % image_size;
+			}
+			message += temp;
+		}
+		cout << message << endl;
+	}
+	
+	
+	return 0;
+}
+
